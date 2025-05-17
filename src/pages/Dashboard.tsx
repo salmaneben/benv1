@@ -5,18 +5,6 @@ import RecentContent from '../components/dashboard/RecentContent';
 import ActivityLog from '../components/dashboard/ActivityLog';
 
 const Dashboard: React.FC = () => {
-  // Calculate total books from BooksLibrary data
-  const totalBooks = 284; // From books pagination showing "1 to 5 of 284 entries"
-  
-  // Calculate total audio files from AudioLibrary data
-  const totalAudio = 156; // From audio pagination showing "1 to 5 of 156 entries"
-  
-  // Calculate total videos from VideoLibrary data
-  const totalVideos = 98; // From video pagination showing "1 to 5 of 98 entries"
-  
-  // Calculate total users from UserManagement data
-  const totalUsers = 52; // From users pagination showing "1 to 5 of 52 entries"
-  
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -37,29 +25,29 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Books" 
-          value={totalBooks} 
-          change={12} 
+          value={0} 
+          change={0} 
           icon={<BookOpen size={20} />}
           type="books"
         />
         <StatCard 
           title="Audio Files" 
-          value={totalAudio} 
-          change={8} 
+          value={0} 
+          change={0} 
           icon={<Headphones size={20} />}
           type="audio"
         />
         <StatCard 
           title="Video Content" 
-          value={totalVideos} 
-          change={15} 
+          value={0} 
+          change={0} 
           icon={<Video size={20} />}
           type="video"
         />
         <StatCard 
           title="Active Users" 
-          value={totalUsers} 
-          change={21} 
+          value={0} 
+          change={0} 
           icon={<Users size={20} />}
         />
       </div>
@@ -102,14 +90,13 @@ const Dashboard: React.FC = () => {
         <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h3 className="font-medium">Storage Usage</h3>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            Total: 2.4TB / 3TB
+            Total: 0 GB / 3TB
           </div>
         </div>
         <div className="p-5">
-          {/* Chart would be implemented here, showing a mock chart for now */}
           <div className="h-60 flex flex-col justify-center items-center">
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-6">
-              <div className="bg-blue-600 h-4 rounded-full" style={{ width: '80%' }}></div>
+              <div className="bg-blue-600 h-4 rounded-full" style={{ width: '0%' }}></div>
             </div>
             <div className="grid grid-cols-3 gap-8 w-full">
               <div className="text-center">
@@ -117,10 +104,10 @@ const Dashboard: React.FC = () => {
                   <BookOpen size={18} />
                 </div>
                 <div className="text-sm font-medium">Books</div>
-                <div className="text-lg font-bold">365 GB</div>
+                <div className="text-lg font-bold">0 GB</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center">
                   <ArrowUpRight size={12} className="text-green-500" />
-                  <span className="text-green-500">+8%</span> from last month
+                  <span className="text-green-500">0%</span> from last month
                 </div>
               </div>
               <div className="text-center">
@@ -128,10 +115,10 @@ const Dashboard: React.FC = () => {
                   <Headphones size={18} />
                 </div>
                 <div className="text-sm font-medium">Audio</div>
-                <div className="text-lg font-bold">942 GB</div>
+                <div className="text-lg font-bold">0 GB</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center">
                   <ArrowUpRight size={12} className="text-green-500" />
-                  <span className="text-green-500">+12%</span> from last month
+                  <span className="text-green-500">0%</span> from last month
                 </div>
               </div>
               <div className="text-center">
@@ -139,10 +126,10 @@ const Dashboard: React.FC = () => {
                   <Video size={18} />
                 </div>
                 <div className="text-sm font-medium">Video</div>
-                <div className="text-lg font-bold">1.1 TB</div>
+                <div className="text-lg font-bold">0 GB</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center">
                   <ArrowUpRight size={12} className="text-green-500" />
-                  <span className="text-green-500">+15%</span> from last month
+                  <span className="text-green-500">0%</span> from last month
                 </div>
               </div>
             </div>
