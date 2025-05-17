@@ -1,23 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Filter, Download, ChevronDown, Edit, Trash, Eye } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface Book {
-  id: number;
+  id: string;
   title: string;
-  cover: string;
+  cover_url: string;
   author: string;
   categories: string[];
   format: string;
   downloads: number;
   status: 'draft' | 'pending' | 'published' | 'featured';
-  dateAdded: string;
+  created_at: string;
 }
 
 const BooksLibrary: React.FC = () => {
-  const [selectedBooks, setSelectedBooks] = useState<number[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const books: Book[] = [];
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('books')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setBooks(data || []);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const toggleSelectAll = () => {
     if (selectedBooks.length === books.length) {
@@ -27,11 +48,34 @@ const BooksLibrary: React.FC = () => {
     }
   };
   
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: string) => {
     if (selectedBooks.includes(id)) {
       setSelectedBooks(selectedBooks.filter(bookId => bookId !== id));
     } else {
       setSelectedBooks([...selectedBooks, id]);
+    }
+  };
+
+  const handleDelete = async (ids: string[]) => {
+    if (!confirm('Are you sure you want to delete the selected books?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('books')
+        .delete()
+        .in('id', ids);
+
+      if (error) throw error;
+
+      // Refresh the books list
+      await fetchBooks();
+      // Clear selection
+      setSelectedBooks([]);
+    } catch (error) {
+      console.error('Error deleting books:', error);
+      alert('Failed to delete books. Please try again.');
     }
   };
   
@@ -91,7 +135,10 @@ const BooksLibrary: React.FC = () => {
                   <Edit size={16} className="mr-1" />
                   Edit
                 </button>
-                <button className="btn btn-outline text-sm text-red-600 dark:text-red-400">
+                <button 
+                  className="btn btn-outline text-sm text-red-600 dark:text-red-400"
+                  onClick={() => handleDelete(selectedBooks)}
+                >
                   <Trash size={16} className="mr-1" />
                   Delete
                 </button>
@@ -172,7 +219,13 @@ const BooksLibrary: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {books.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={10} className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    Loading books...
+                  </td>
+                </tr>
+              ) : books.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No books available yet
@@ -191,7 +244,15 @@ const BooksLibrary: React.FC = () => {
                     </td>
                     <td>
                       <div className="h-12 w-10 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                        <BookOpen size={18} className="text-gray-500 dark:text-gray-400" />
+                        {book.cover_url ? (
+                          <img 
+                            src={book.cover_url} 
+                            alt={book.title}
+                            className="h-full w-full object-cover rounded"
+                          />
+                        ) : (
+                          <BookOpen size={18} className="text-gray-500 dark:text-gray-400" />
+                        )}
                       </div>
                     </td>
                     <td>
@@ -200,7 +261,7 @@ const BooksLibrary: React.FC = () => {
                     <td>{book.author}</td>
                     <td>
                       <div className="flex flex-wrap gap-1">
-                        {book.categories.map((category, index) => (
+                        {book.categories?.map((category, index) => (
                           <span 
                             key={index}
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
@@ -217,7 +278,7 @@ const BooksLibrary: React.FC = () => {
                     </td>
                     <td>{book.downloads.toLocaleString()}</td>
                     <td>{getStatusBadge(book.status)}</td>
-                    <td>{new Date(book.dateAdded).toLocaleDateString()}</td>
+                    <td>{new Date(book.created_at).toLocaleDateString()}</td>
                     <td>
                       <div className="flex items-center justify-end gap-2">
                         <button className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
@@ -226,7 +287,10 @@ const BooksLibrary: React.FC = () => {
                         <button className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
                           <Edit size={18} />
                         </button>
-                        <button className="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400">
+                        <button 
+                          className="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                          onClick={() => handleDelete([book.id])}
+                        >
                           <Trash size={18} />
                         </button>
                       </div>
@@ -240,7 +304,7 @@ const BooksLibrary: React.FC = () => {
         
         <div className="px-6 py-4 bg-gray-50 dark:bg-gray-750 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            No entries to show
+            {books.length === 0 ? 'No entries to show' : `Showing ${books.length} books`}
           </div>
           
           <div className="flex items-center gap-1">
